@@ -38,11 +38,11 @@ export default function RecipePage() {
                         <p className="text-muted-foreground mt-2">{recipe.notes}</p>
                         <div className="flex items-center gap-2 mt-2">
                             <div className="flex items-center text-sm text-muted-foreground">
-                                <span className="font-medium">{recipe.prepTime} prep</span>
+                                <span className="font-medium">{recipe.preparationTime} preparación</span>
                                 <span className="mx-2">•</span>
-                                <span className="font-medium">{recipe.cookTime} cook</span>
+                                <span className="font-medium">{recipe.cookingTime} cocina</span>
                                 <span className="mx-2">•</span>
-                                <span className="font-medium">{recipe.servings} servings</span>
+                                <span className="font-medium">{recipe.servings} persionas</span>
                             </div>
                         </div>
                     </div>
@@ -52,31 +52,29 @@ export default function RecipePage() {
                     <div>
                         <h2 className="text-xl font-semibold mb-4">Ingredientes</h2>
                         <Card className="p-6">
-                            {
-                                recipe.ingredients
-                                /*<ul className="grid gap-2 sm:grid-cols-2">
-                                {recipe.ingredients.map((ingredient, index) => (
+                            <ul className="grid gap-2 sm:grid-cols-2">
+                                {recipe.recipeIngredients.map((ingredient, index) => (
                                     <li key={index} className="flex items-center gap-2">
                                         <div className="h-2 w-2 rounded-full bg-primary"/>
                                         <span>{ingredient}</span>
                                     </li>
                                 ))}
-                            </ul>*/}
+                            </ul>
                         </Card>
                     </div>
 
                     <div>
-                        <h2 className="text-xl font-semibold mb-4">Instructiones</h2>
+                        <h2 className="text-xl font-semibold mb-4">Instrucciones</h2>
                         <Card className="p-6">
-                            {
-                                recipe.steps
-                                /*<ol className="space-y-4 ml-4 list-decimal">
-                                {recipe.steps.map((step, index) => (
+
+
+                            <ol className="space-y-4 ml-4 list-decimal">
+                                {recipe.recipeSteps.map((step, index) => (
                                     <li key={index} className="pl-2">
                                         <p>{step}</p>
                                     </li>
                                 ))}
-                            </ol>*/}
+                            </ol>
                         </Card>
                     </div>
                 </div>

@@ -1,9 +1,8 @@
 import HomePage from "@/components/app/HomePage.tsx";
 import {Route, Routes} from "react-router";
-
-import RecipeForm from "@/components/app/RecipeForm.tsx";
 import RecipePage from "@/components/app/RecipePage.tsx";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import NewRecipePage from "@/components/app/NewRecipePage.tsx";
 
 const queryClient = new QueryClient()
 
@@ -12,7 +11,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
             <Routes>
                 <Route index element={<HomePage/>}/>
-                <Route path="/recipes/new" element={<RecipeForm/>}/>
+                <Route path="/recipes/new" element={<NewRecipePage/>}/>
                 <Route path="/recipes" element={<HomePage/>}/>
                 <Route path="/recipes/:recipe-id" element={<RecipePage/>}/>
             </Routes>

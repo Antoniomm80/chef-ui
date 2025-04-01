@@ -30,11 +30,11 @@ export default function RecipeGrid({recipes}: RecipeGridProps) {
                         <CardFooter className="p-4 pt-0 flex justify-between text-sm text-muted-foreground">
                             <div className="flex items-center">
                                 <Clock className="h-4 w-4 mr-1"/>
-                                <span>{recipe.totalTime}</span>
+                                <span>{`${recipe.preparationTime + recipe.cookingTime} minutos `}</span>
                             </div>
                             <div className="flex items-center">
                                 <Users className="h-4 w-4 mr-1"/>
-                                <span>{recipe.servings} servings</span>
+                                <span>{recipe.servings} personas</span>
                             </div>
                         </CardFooter>
                     </Card>

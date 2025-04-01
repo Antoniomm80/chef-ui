@@ -4,6 +4,12 @@ export interface RecipeBackend {
     notes: string,
     ingredients: string,
     steps: string,
-    imageUrl: string
+    recipeUrl: string,
+    imageUrl: string,
+    servings: number,
+    preparationTime: number,
+    cookingTime: number,
+    recipeSteps: string[],
+    recipeIngredients: string[],
 }
 
