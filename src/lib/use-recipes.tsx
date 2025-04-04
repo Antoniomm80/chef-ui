@@ -1,11 +1,12 @@
 import {RecipeBackend} from "@/lib/recipeBackend.ts";
 import {useQuery} from "@tanstack/react-query";
 import axios, {AxiosError} from "axios";
+import {SERVER_URL} from "@/config.ts";
 
-const recipesService = {
+export const recipesService = {
     async findAll(): Promise<RecipeBackend[]> {
         try {
-            const result = await axios.get<RecipeBackend[]>(`/chef/api/v1/recipes`);
+            const result = await axios.get<RecipeBackend[]>(`${SERVER_URL}/recipes`);
             return result.data;
         } catch (error) {
             const errors = error as Error | AxiosError;
@@ -18,7 +19,21 @@ const recipesService = {
     },
     async findById(recipeId: number): Promise<RecipeBackend> {
         try {
-            const result = await axios.get<RecipeBackend>(`/chef/api/v1/recipes/${recipeId}`);
+            const result = await axios.get<RecipeBackend>(`${SERVER_URL}/recipes/${recipeId}`);
+            return result.data;
+        } catch (error) {
+            const errors = error as Error | AxiosError;
+            if (axios.isAxiosError(error)) {
+                throw new Error(errors.message);
+            } else {
+                throw error;
+            }
+        }
+    },
+
+    async createRecipe(recipe: Partial<RecipeBackend>): Promise<RecipeBackend> {
+        try {
+            const result = await axios.post<RecipeBackend>(`${SERVER_URL}/recipes`, recipe);
             return result.data;
         } catch (error) {
             const errors = error as Error | AxiosError;

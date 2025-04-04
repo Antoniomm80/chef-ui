@@ -8,6 +8,8 @@ import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Textarea} from "@/components/ui/textarea"
 import {RecipeBackend} from "@/lib/recipeBackend.ts";
+import {recipesService} from "@/lib/use-recipes.tsx";
+import {toast} from "sonner";
 
 
 interface RecipeFormProps {
@@ -103,10 +105,9 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        // Here you would typically save the recipe data
-        console.log("Recipe data:", formData)
-        alert("Recipe saved successfully!")
-        // In a real app, you would redirect to the recipe page or list
+        recipesService.createRecipe(formData);
+        toast("La receta se ha guardado correctamente")
+
     }
 
     const handleParseUrl = async () => {
