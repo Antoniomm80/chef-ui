@@ -1,7 +1,7 @@
 import type React from "react"
 import {useEffect, useState} from "react"
 import {BotIcon as Robot, Plus, X} from "lucide-react"
-
+import {LoadingButton} from '@/components/ui/loadingbutton';
 import {Button} from "@/components/ui/button"
 import {Card, CardContent} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
@@ -37,6 +37,7 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
     const [imageUrls, setImageUrls] = useState<string[]>([])
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [imagePreview, setImagePreview] = useState<string>(initialData?.imageUrl || "")
+    const [loading, setLoading] = useState(false);
 
     // Update image preview when image URL changes
     useEffect(() => {
@@ -139,8 +140,10 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
             alert("Please enter a recipe URL to parse")
             return
         }
+        setLoading(true);
         const result = await axios.post<ScrappedRecipe>(`/chef/api/v1/recipes/scrape`, {url: formData.recipeUrl});
         const scrappedRecipe = result.data;
+        setLoading(false);
         /*const scrappedRecipe = JSON.parse("{\n" +
             "    \"name\": \"Pierna de cerdo al horno\",\n" +
             "    \"description\": \"Cocinar esta receta de pierna de cerdo al horno es una gran satisfacción tanto para quien la prepara como para sus destinatarios. La piel cortada en pequeños rombos es muy crujiente por fuera y muy jugosa por dentro, y probarla produce prácticamente la misma sensación que cuando comes torreznos. La carne, con un increíble sabor gracias al adobo o marinada, está riquísima tanto en caliente, recién hecha, como días después usándola como fiambre.\",\n" +
@@ -239,10 +242,10 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
                                 onChange={handleChange}
                                 placeholder="Url de la receta original"
                             />
-                            <Button type="button" onClick={handleParseUrl} className="shrink-0" variant="secondary">
+                            <LoadingButton loading={loading} type="button" onClick={handleParseUrl} className="shrink-0" variant="secondary">
                                 <Robot className="h-4 w-4 mr-2"/>
                                 Procesar
-                            </Button>
+                            </LoadingButton>
                         </div>
                         <p className="text-sm text-muted-foreground">
                             Pulsa el botón Procesar para generar la receta con IA a partir de la URL

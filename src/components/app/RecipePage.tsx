@@ -42,7 +42,7 @@ export default function RecipePage() {
                                 <span className="mx-2">•</span>
                                 <span className="font-medium">{recipe.cookingTime} cocina</span>
                                 <span className="mx-2">•</span>
-                                <span className="font-medium">{recipe.servings} persionas</span>
+                                <span className="font-medium">{recipe.servings} personas</span>
                             </div>
                         </div>
                     </div>
