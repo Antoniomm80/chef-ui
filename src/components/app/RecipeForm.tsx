@@ -30,6 +30,8 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
         ...initialData,
     })
 
+    const [imageUrls, setImageUrls] = useState<string[]>([])
+    const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [imagePreview, setImagePreview] = useState<string>(initialData?.imageUrl || "")
 
     // Update image preview when image URL changes
@@ -103,11 +105,24 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
         })
     }
 
+    const handleImageCycle = (direction: "prev" | "next") => {
+        if (direction === "prev" && currentImageIndex > 0) {
+            setCurrentImageIndex(currentImageIndex - 1)
+        } else if (direction === "next" && currentImageIndex < imageUrls.length - 1) {
+            setCurrentImageIndex(currentImageIndex + 1)
+        }
+        if (imageUrls.length > 0) {
+            setFormData({
+                ...formData,
+                imageUrl: imageUrls[currentImageIndex],
+            })
+        }
+    }
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         recipesService.createRecipe(formData);
         toast("La receta se ha guardado correctamente")
-
     }
 
     const handleParseUrl = async () => {
@@ -173,6 +188,8 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
             cookingTime: scrappedRecipe.cookingTime || 0,
             servings: scrappedRecipe.servings || 0,
         })
+        setImageUrls([...scrappedRecipe.imageUrls])
+        setCurrentImageIndex(0)
     }
 
     return (
@@ -287,6 +304,33 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
                         <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground">
                             La vista de la imagen se mostrará aquí
                         </div>
+                    )}
+                    {imageUrls.length > 1 && (
+                        <div className="flex justify-between gap-2">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleImageCycle("prev")}
+                                disabled={currentImageIndex === 0}
+                            >
+                                Anterior
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleImageCycle("next")}
+                                disabled={currentImageIndex === imageUrls.length - 1}
+                            >
+                                Siguiente
+                            </Button>
+                        </div>
+                    )}
+                    {imageUrls.length > 0 && (
+                        <p className="text-sm text-center text-muted-foreground">
+                            Image {currentImageIndex + 1} of {imageUrls.length}
+                        </p>
                     )}
 
                 </div>
