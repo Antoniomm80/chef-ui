@@ -10,6 +10,9 @@ import {Textarea} from "@/components/ui/textarea"
 import {RecipeBackend} from "@/lib/recipeBackend.ts";
 import {recipesService} from "@/lib/use-recipes.tsx";
 import {toast} from "sonner";
+import {useNavigate} from "react-router";
+import {ScrappedRecipe} from "@/lib/scrappedRecipe.ts";
+import axios from "axios";
 
 
 interface RecipeFormProps {
@@ -17,6 +20,7 @@ interface RecipeFormProps {
 }
 
 export default function RecipeForm({initialData}: RecipeFormProps) {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState<Partial<RecipeBackend>>({
         name: "",
         notes: "",
@@ -106,15 +110,17 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
     }
 
     const handleImageCycle = (direction: "prev" | "next") => {
+        let newIndex = currentImageIndex;
         if (direction === "prev" && currentImageIndex > 0) {
-            setCurrentImageIndex(currentImageIndex - 1)
+            newIndex--;
         } else if (direction === "next" && currentImageIndex < imageUrls.length - 1) {
-            setCurrentImageIndex(currentImageIndex + 1)
+            newIndex++;
         }
+        setCurrentImageIndex(newIndex);
         if (imageUrls.length > 0) {
             setFormData({
                 ...formData,
-                imageUrl: imageUrls[currentImageIndex],
+                imageUrl: imageUrls[newIndex],
             })
         }
     }
@@ -122,7 +128,10 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         recipesService.createRecipe(formData);
-        toast("La receta se ha guardado correctamente")
+        toast("La receta se ha guardado correctamente");
+//route to root with react router
+        navigate("/");
+
     }
 
     const handleParseUrl = async () => {
@@ -130,9 +139,9 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
             alert("Please enter a recipe URL to parse")
             return
         }
-        //const result = await axios.post<ScrappedRecipe>(`/chef/api/v1/recipes/scrape`, {url: formData.recipeUrl});
-        //const scrappedRecipe = result.data;
-        const scrappedRecipe = JSON.parse("{\n" +
+        const result = await axios.post<ScrappedRecipe>(`/chef/api/v1/recipes/scrape`, {url: formData.recipeUrl});
+        const scrappedRecipe = result.data;
+        /*const scrappedRecipe = JSON.parse("{\n" +
             "    \"name\": \"Pierna de cerdo al horno\",\n" +
             "    \"description\": \"Cocinar esta receta de pierna de cerdo al horno es una gran satisfacción tanto para quien la prepara como para sus destinatarios. La piel cortada en pequeños rombos es muy crujiente por fuera y muy jugosa por dentro, y probarla produce prácticamente la misma sensación que cuando comes torreznos. La carne, con un increíble sabor gracias al adobo o marinada, está riquísima tanto en caliente, recién hecha, como días después usándola como fiambre.\",\n" +
             "    \"ingredients\": [\n" +
@@ -175,7 +184,7 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
             "        \"https://img.youtube.com/vi/boss9VZNtJk/mqdefault.jpg\"\n" +
             "    ],\n" +
             "    \"recipeUrl\": \"https://www.directoalpaladar.com/recetas-de-carnes-y-aves/pierna-cerdo-al-horno-deliciosa-receta-pernil-asado-para-celebraciones-familiares-amigos\"\n" +
-            "}");
+            "}");*/
         setFormData({
             ...formData,
             name: scrappedRecipe.name || "",
@@ -297,7 +306,7 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
                         <img
                             src={imagePreview || "https://placehold.co/600x400/png"}
                             alt="Recipe preview"
-                            className="w-full aspect-square object-cover"
+                            className="w-full aspect-square object-cover rounded-md shadow-md"
                             onError={() => setImagePreview("https://placehold.co/600x400/png")}
                         />
                     ) : (
@@ -329,7 +338,7 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
                     )}
                     {imageUrls.length > 0 && (
                         <p className="text-sm text-center text-muted-foreground">
-                            Image {currentImageIndex + 1} of {imageUrls.length}
+                            Imagen {currentImageIndex + 1} de {imageUrls.length}
                         </p>
                     )}
 

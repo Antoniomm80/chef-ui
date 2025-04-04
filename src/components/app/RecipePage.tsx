@@ -28,13 +28,13 @@ export default function RecipePage() {
 
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
                 <div className="space-y-4">
-                    <div className="relative aspect-square overflow-hidden rounded-lg">
+                    <div className="relative aspect-square overflow-hidden rounded-lg shadow-md">
                         <img src={recipe.imageUrl || "/placeholder.svg"} alt={recipe.name} className="w-full h-full object-cover"/>
                     </div>
                 </div>
                 <div className="space-y-6">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">{recipe.name}</h1>
+                        <h1 className="text-4xl font-bold tracking-tight">{recipe.name}</h1>
                         <p className="text-muted-foreground mt-2">{recipe.notes}</p>
                         <div className="flex items-center gap-2 mt-2">
                             <div className="flex items-center text-sm text-muted-foreground">

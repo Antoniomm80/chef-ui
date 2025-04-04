@@ -15,7 +15,7 @@ export default function RecipeGrid({recipes}: RecipeGridProps) {
             {recipes.map((recipe) => (
 
                 <Link key={recipe.id} to={`/recipes/${recipe.id}`} className="block">
-                    <Card className="h-full overflow-hidden hover:shadow-md transition-shadow">
+                    <Card className="h-full overflow-hidden hover:shadow-md transition-shadow pt-0">
                         <div className="relative aspect-square">
                             <img
                                 src={recipe.imageUrl || "https://placehold.co/600x400/png"}
