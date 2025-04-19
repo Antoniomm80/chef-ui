@@ -13,6 +13,7 @@ import {toast} from "sonner";
 import {useNavigate} from "react-router";
 import {ScrappedRecipe} from "@/lib/scrappedRecipe.ts";
 import axios from "axios";
+import {useQueryClient} from "@tanstack/react-query";
 
 
 interface RecipeFormProps {
@@ -21,6 +22,7 @@ interface RecipeFormProps {
 
 export default function RecipeForm({initialData}: RecipeFormProps) {
     const navigate = useNavigate();
+    const queryClient = useQueryClient()
     const [formData, setFormData] = useState<Partial<RecipeBackend>>({
         name: "",
         notes: "",
@@ -130,7 +132,11 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
         e.preventDefault()
         recipesService.createRecipe(formData);
         toast("La receta se ha guardado correctamente");
-//route to root with react router
+        //Reset react query cache
+        queryClient.invalidateQueries({
+            queryKey: ['recipes'],
+            exact: true,
+        })
         navigate("/");
 
     }

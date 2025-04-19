@@ -16,14 +16,14 @@ export default function RecipeGrid({recipes}: RecipeGridProps) {
 
                 <Link key={recipe.id} to={`/recipes/${recipe.id}`} className="block">
                     <Card className="h-full overflow-hidden hover:shadow-md transition-shadow pt-0">
-                        <div className="relative aspect-square">
-                            <img
-                                src={recipe.imageUrl || "https://placehold.co/600x400/png"}
-                                alt={recipe.name}
-                                className="w-full h-full object-cover transition-transform hover:scale-105"
-                            />
-                        </div>
-                        <CardContent className="p-4">
+
+                        <img
+                            src={recipe.imageUrl || "https://placehold.co/600x400/png"}
+                            alt={recipe.name}
+                            className="w-full aspect-3/2 h-full object-cover transition-transform hover:scale-105"
+                        />
+
+                        <CardContent className="p-4 flex-grow">
                             <h2 className="font-semibold text-xl line-clamp-1">{recipe.name}</h2>
                             <p className="text-muted-foreground text-sm mt-1 line-clamp-2">{recipe.notes}</p>
                         </CardContent>
