@@ -20,7 +20,7 @@ export default function RecipeGrid({recipes}: RecipeGridProps) {
                         <img
                             src={recipe.imageUrl || "https://placehold.co/600x400/png"}
                             alt={recipe.name}
-                            className="w-full aspect-3/2 h-full object-cover transition-transform hover:scale-105"
+                            className="w-full aspect-3/2 md:aspect-square object-cover transition-transform hover:scale-105"
                         />
 
                         <CardContent className="p-4 flex-grow">
