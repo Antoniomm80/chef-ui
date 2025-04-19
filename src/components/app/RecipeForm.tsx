@@ -130,10 +130,11 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        await recipesService.createRecipe(formData);
-        queryClient.invalidateQueries({
-            queryKey: ['recipes'],
-            exact: true,
+        const newRecipe = await recipesService.createRecipe(formData);
+        //updates the cache
+        queryClient.setQueryData<RecipeBackend[]>(["recipes"], (oldData) => {
+            if (!oldData) return [];
+            return [...oldData, newRecipe];
         })
         toast("La receta se ha guardado correctamente");
         navigate("/");
