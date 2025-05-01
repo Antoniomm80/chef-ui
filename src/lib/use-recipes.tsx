@@ -44,6 +44,19 @@ export const recipesService = {
             }
         }
     },
+    async deleteRecipe(recipeId: number): Promise<RecipeBackend> {
+        try {
+            const result = await axios.delete<RecipeBackend>(`${SERVER_URL}/recipes/${recipeId}`);
+            return result.data;
+        } catch (error) {
+            const errors = error as Error | AxiosError;
+            if (axios.isAxiosError(error)) {
+                throw new Error(errors.message);
+            } else {
+                throw error;
+            }
+        }
+    },
 }
 
 export function useRecipes(): RecipeBackend[] {

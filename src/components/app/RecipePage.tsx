@@ -1,30 +1,73 @@
-import {ChevronLeft} from "lucide-react"
+import {ChevronLeft, Trash2} from "lucide-react"
 
 import {Button} from "@/components/ui/button"
 import {Card} from "@/components/ui/card"
 import {Separator} from "@/components/ui/separator"
-import {Link, useParams} from "react-router";
-import {useRecipe} from "@/lib/use-recipes.tsx";
+import {Link, useNavigate, useParams} from "react-router";
+import {recipesService, useRecipe} from "@/lib/use-recipes.tsx";
+import {useState} from "react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import {RecipeBackend} from "@/lib/recipeBackend.ts";
+import {toast} from "sonner";
+import {useQueryClient} from "@tanstack/react-query";
 
 
 export default function RecipePage() {
     const {"recipe-id": recipeId} = useParams();
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
     if (!recipeId) {
         throw new Error("recipeId is required")
     }
     const recipe = useRecipe(parseInt(recipeId))
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
+    const handleDelete = async () => {
+        await recipesService.deleteRecipe(parseInt(recipeId));
+        //updates the cache
+        queryClient.setQueryData<RecipeBackend[]>(["recipes"], (oldData) => {
+            if (!oldData) {
+                return [];
+            }
+            return oldData.filter((recipe) => recipe.id !== recipeId);
+        })
+        toast("La receta se ha eliminado correctamente");
+        navigate("/");
+    }
     if (!recipe) {
         return;
     }
 
     return (
         <div className="container px-4 py-8 md:py-12">
-            <Button variant="ghost" asChild className="mb-6">
-                <Link to="/">
-                    <ChevronLeft className="mr-2 h-4 w-4"/>
-                    Volver al listado
-                </Link>
-            </Button>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                <Button variant="ghost" asChild className="w-fit">
+                    <Link to="/">
+                        <ChevronLeft className="mr-2 h-4 w-4"/>
+                        Volver al listado
+                    </Link>
+                </Button>
+
+                <div className="flex gap-2">
+                    {/*<Button asChild variant="outline">
+                        <a href={`/recipes/edit/${recipe.id}`}>Edit Recipe</a>
+                    </Button>*/}
+                    <Button variant="destructive" onClick={() => setIsDeleteDialogOpen(true)}>
+                        <Trash2 className="h-4 w-4 mr-2"/>
+                        Borrar receta
+                    </Button>
+                </div>
+            </div>
 
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
                 <div className="space-y-4">
@@ -79,6 +122,25 @@ export default function RecipePage() {
                     </div>
                 </div>
             </div>
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>¿Estas seguro de que quieres eliminar esta receta?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Esta acción no se puede deshacer. Esto eliminará permanentemente la receta "{recipe.name}".
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDelete}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            Borrar
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }

@@ -22,7 +22,7 @@ interface RecipeFormProps {
 
 export default function RecipeForm({initialData}: RecipeFormProps) {
     const navigate = useNavigate();
-    const queryClient = useQueryClient()
+    const queryClient = useQueryClient();
     const [formData, setFormData] = useState<Partial<RecipeBackend>>({
         name: "",
         notes: "",
