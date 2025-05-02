@@ -26,6 +26,7 @@ function useDebounce<T>(value: T, delay: number): T {
 
 export default function HomePage() {
     const recipes: RecipeBackend[] = useRecipes();
+
     const [searchQuery, setSearchQuery] = useState("")
     const [searchResults, setSearchResults] = useState(recipes)
 
@@ -35,12 +36,10 @@ export default function HomePage() {
 
     // Search function that would eventually hit a backend
     const performSearch = useCallback((query: string) => {
-
-
         // Simulate a backend call with setTimeout
         setTimeout(() => {
             if (query.length < 3) {
-                setSearchResults(recipes)
+                setSearchResults(recipes);
             } else {
                 const filtered = recipes.filter((recipe) => {
                     const q = query.toLowerCase()
@@ -50,7 +49,7 @@ export default function HomePage() {
             }
 
         }, 100) // Simulate network delay
-    }, [])
+    }, [recipes])
 
     // Effect to trigger search when debounced term changes
     useEffect(() => {
