@@ -43,7 +43,7 @@ export default function HomePage() {
             } else {
                 const filtered = recipes.filter((recipe) => {
                     const q = query.toLowerCase()
-                    return recipe.name.toLowerCase().includes(q) || recipe.notes.toLowerCase().includes(q)
+                    return recipe.name?.toLowerCase().includes(q) || recipe.notes?.toLowerCase().includes(q)
                 })
                 setSearchResults(filtered)
             }
