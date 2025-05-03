@@ -6,7 +6,7 @@ import {Link} from "react-router";
 
 export default function NewRecipePage() {
     return (
-        <div className="container px-4 py-8 md:py-12">
+        <div className="container px-4 py-8 md:py-12 mx-auto">
             <Button variant="ghost" asChild className="mb-6">
                 <Link to="/">
                     <ChevronLeft className="mr-2 h-4 w-4"/>

@@ -48,7 +48,7 @@ export default function RecipePage() {
     }
 
     return (
-        <div className="container px-4 py-8 md:py-12">
+        <div className="container px-4 py-8 md:py-12 mx-auto">
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                 <Button variant="ghost" asChild className="w-fit">
