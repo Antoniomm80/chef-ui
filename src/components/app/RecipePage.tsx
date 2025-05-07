@@ -1,146 +1,46 @@
-import {ChevronLeft, Trash2} from "lucide-react"
-
-import {Button} from "@/components/ui/button"
-import {Card} from "@/components/ui/card"
 import {Separator} from "@/components/ui/separator"
-import {Link, useNavigate, useParams} from "react-router";
-import {recipesService, useRecipe} from "@/lib/use-recipes.tsx";
+import {useParams} from "react-router";
+import {useRecipe} from "@/lib/use-recipes.tsx";
+import {DeleteDialog} from "@/components/app/DeleteDialog.tsx";
 import {useState} from "react";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import {RecipeBackend} from "@/lib/recipeBackend.ts";
-import {toast} from "sonner";
-import {useQueryClient} from "@tanstack/react-query";
+import {InstructionsCard} from "@/components/app/InstructionsCard.tsx";
+import {IngredientsCard} from "@/components/app/IngredientsCard.tsx";
+import {RecipeInfoPanel} from "@/components/app/RecipeInfoPanel.tsx";
+import {RecipeImage} from "@/components/app/RecipeImage.tsx";
+import {RecipeToolbar} from "@/components/app/RecipeToolbar.tsx";
 
 
 export default function RecipePage() {
     const {"recipe-id": recipeId} = useParams();
-    const queryClient = useQueryClient();
-    const navigate = useNavigate();
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     if (!recipeId) {
         throw new Error("recipeId is required")
     }
     const recipe = useRecipe(parseInt(recipeId))
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-
-    const handleDelete = async () => {
-        await recipesService.deleteRecipe(parseInt(recipeId));
-        //updates the cache
-        queryClient.setQueryData<RecipeBackend[]>(["recipes"], (oldData) => {
-            if (!oldData) {
-                return [];
-            }
-            return oldData.filter((recipe) => recipe.id !== recipeId);
-        })
-        toast("La receta se ha eliminado correctamente");
-        navigate("/");
-    }
     if (!recipe) {
         return;
     }
 
     return (
         <div className="container px-4 py-8 md:py-12 mx-auto">
-
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-                <Button variant="ghost" asChild className="w-fit">
-                    <Link to="/">
-                        <ChevronLeft className="mr-2 h-4 w-4"/>
-                        Volver al listado
-                    </Link>
-                </Button>
-
-                <div className="flex gap-2">
-                    {/*<Button asChild variant="outline">
-                        <a href={`/recipes/edit/${recipe.id}`}>Edit Recipe</a>
-                    </Button>*/}
-                    <Button variant="destructive" onClick={() => setIsDeleteDialogOpen(true)}>
-                        <Trash2 className="h-4 w-4 mr-2"/>
-                        Borrar receta
-                    </Button>
-                </div>
+                <RecipeToolbar setIsDeleteDialogOpen={setIsDeleteDialogOpen}/>
             </div>
-
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
                 <div className="space-y-4">
-                    <div className="relative aspect-square overflow-hidden rounded-lg shadow-md">
-                        <img src={recipe.imageUrl || "/placeholder.svg"} alt={recipe.name} className="w-full h-full object-cover"/>
-                    </div>
+                    <RecipeImage imageUrl={recipe.imageUrl} imageAlt={recipe.name}/>
                 </div>
                 <div className="space-y-6">
-                    <div>
-                        <h1 className="text-4xl font-bold tracking-tight">{recipe.name}</h1>
-                        <p className="text-muted-foreground mt-2">{recipe.notes}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                            <div className="flex items-center text-sm text-muted-foreground">
-                                <span className="font-medium">{recipe.preparationTime} preparación</span>
-                                <span className="mx-2">•</span>
-                                <span className="font-medium">{recipe.cookingTime} cocina</span>
-                                <span className="mx-2">•</span>
-                                <span className="font-medium">{recipe.servings} personas</span>
-                            </div>
-                        </div>
-                    </div>
-
+                    <RecipeInfoPanel recipe={recipe}/>
                     <Separator/>
-
-                    <div>
-                        <h2 className="text-xl font-semibold mb-4">Ingredientes</h2>
-                        <Card className="p-6">
-                            <ul className="grid gap-2 sm:grid-cols-2">
-                                {recipe.recipeIngredients.map((ingredient, index) => (
-                                    <li key={index} className="flex items-center gap-2">
-                                        <div className="h-2 w-2 rounded-full bg-primary"/>
-                                        <span>{ingredient}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </Card>
-                    </div>
-
-                    <div>
-                        <h2 className="text-xl font-semibold mb-4">Instrucciones</h2>
-                        <Card className="p-6">
-
-
-                            <ol className="space-y-4 ml-4 list-decimal">
-                                {recipe.recipeSteps.map((step, index) => (
-                                    <li key={index} className="pl-2">
-                                        <p>{step}</p>
-                                    </li>
-                                ))}
-                            </ol>
-                        </Card>
-                    </div>
+                    <IngredientsCard recipeIngredients={recipe.recipeIngredients}/>
+                    <InstructionsCard recipeSteps={recipe.recipeSteps}/>
                 </div>
             </div>
-            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>¿Estas seguro de que quieres eliminar esta receta?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Esta acción no se puede deshacer. Esto eliminará permanentemente la receta "{recipe.name}".
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleDelete}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                            Borrar
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <DeleteDialog recipeId={recipeId}
+                          recipeName={recipe.name}
+                          isDeleteDialogOpen={isDeleteDialogOpen}
+                          setIsDeleteDialogOpen={setIsDeleteDialogOpen}/>
         </div>
     )
 }
