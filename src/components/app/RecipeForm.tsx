@@ -1,9 +1,8 @@
 import type React from "react"
-import {useEffect, useState} from "react"
-import {BotIcon as Robot, Plus, X} from "lucide-react"
+import {useState} from "react"
+import {BotIcon as Robot} from "lucide-react"
 import {LoadingButton} from '@/components/ui/loadingbutton';
 import {Button} from "@/components/ui/button"
-import {Card, CardContent} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Textarea} from "@/components/ui/textarea"
@@ -14,6 +13,9 @@ import {useNavigate} from "react-router";
 import {ScrappedRecipe} from "@/lib/scrappedRecipe.ts";
 import axios from "axios";
 import {useQueryClient} from "@tanstack/react-query";
+import {ImagePreview} from "@/components/app/ImagePreview.tsx";
+import {IngredientsSection} from "@/components/app/IngredientsSection.tsx";
+import {StepsSection} from "@/components/app/StepsSection.tsx";
 
 
 interface RecipeFormProps {
@@ -35,16 +37,10 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
         recipeSteps: [""],
         ...initialData,
     })
-
-    const [imageUrls, setImageUrls] = useState<string[]>([])
-    const [currentImageIndex, setCurrentImageIndex] = useState(0)
-    const [imagePreview, setImagePreview] = useState<string>(initialData?.imageUrl || "")
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [loading, setLoading] = useState(false);
 
-    // Update image preview when image URL changes
-    useEffect(() => {
-        setImagePreview(formData.imageUrl || "")
-    }, [formData.imageUrl])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const {name, value} = e.target
@@ -62,71 +58,6 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
         })
     }
 
-    const handleIngredientChange = (index: number, value: string) => {
-        const updatedIngredients = [...(formData.recipeIngredients || [])]
-        updatedIngredients[index] = value
-        setFormData({
-            ...formData,
-            recipeIngredients: updatedIngredients,
-        })
-    }
-
-    const handleStepChange = (index: number, value: string) => {
-        const updatedSteps = [...(formData.recipeSteps || [])]
-        updatedSteps[index] = value
-        setFormData({
-            ...formData,
-            recipeSteps: updatedSteps,
-        })
-    }
-
-    const addIngredient = () => {
-        setFormData({
-            ...formData,
-            recipeIngredients: [...(formData.recipeIngredients || []), ""],
-        })
-    }
-
-    const removeIngredient = (index: number) => {
-        const updatedIngredients = [...(formData.recipeIngredients || [])]
-        updatedIngredients.splice(index, 1)
-        setFormData({
-            ...formData,
-            recipeIngredients: updatedIngredients,
-        })
-    }
-
-    const addStep = () => {
-        setFormData({
-            ...formData,
-            recipeSteps: [...(formData.recipeSteps || []), ""],
-        })
-    }
-
-    const removeStep = (index: number) => {
-        const updatedSteps = [...(formData.recipeSteps || [])]
-        updatedSteps.splice(index, 1)
-        setFormData({
-            ...formData,
-            recipeSteps: updatedSteps,
-        })
-    }
-
-    const handleImageCycle = (direction: "prev" | "next") => {
-        let newIndex = currentImageIndex;
-        if (direction === "prev" && currentImageIndex > 0) {
-            newIndex--;
-        } else if (direction === "next" && currentImageIndex < imageUrls.length - 1) {
-            newIndex++;
-        }
-        setCurrentImageIndex(newIndex);
-        if (imageUrls.length > 0) {
-            setFormData({
-                ...formData,
-                imageUrl: imageUrls[newIndex],
-            })
-        }
-    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -308,131 +239,12 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
                     </div>
                 </div>
 
-                <div className="space-y-4">
-                    <Label>Image Preview</Label>
-
-                    {imagePreview ? (
-                        <img
-                            src={imagePreview || "https://placehold.co/600x400/png"}
-                            alt="Recipe preview"
-                            className="w-full aspect-square object-cover rounded-md shadow-md"
-                            onError={() => setImagePreview("https://placehold.co/600x400/png")}
-                        />
-                    ) : (
-                        <div className="w-full aspect-square bg-muted flex items-center justify-center text-muted-foreground">
-                            La vista de la imagen se mostrará aquí
-                        </div>
-                    )}
-                    {imageUrls.length > 1 && (
-                        <div className="flex justify-between gap-2">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleImageCycle("prev")}
-                                disabled={currentImageIndex === 0}
-                            >
-                                Anterior
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleImageCycle("next")}
-                                disabled={currentImageIndex === imageUrls.length - 1}
-                            >
-                                Siguiente
-                            </Button>
-                        </div>
-                    )}
-                    {imageUrls.length > 0 && (
-                        <p className="text-sm text-center text-muted-foreground">
-                            Imagen {currentImageIndex + 1} de {imageUrls.length}
-                        </p>
-                    )}
-
-                </div>
+                <ImagePreview imageUrls={imageUrls} formData={formData} setFormData={setFormData} currentImageIndex={currentImageIndex}
+                              setCurrentImageIndex={setCurrentImageIndex}/>
             </div>
+            <IngredientsSection formData={formData} setFormData={setFormData}/>
+            <StepsSection formData={formData} setFormData={setFormData}/>
 
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <Label>Ingredients</Label>
-                    <Button type="button" variant="outline" size="sm" onClick={addIngredient} className="flex items-center gap-1">
-                        <Plus className="h-4 w-4"/> Agregar ingrediente
-                    </Button>
-                </div>
-
-                <Card>
-                    <CardContent className="p-4 space-y-3">
-                        {formData.recipeIngredients?.map((ingredient, index) => (
-                            <div key={index} className="flex items-center gap-2">
-                                <Input
-                                    value={ingredient}
-                                    onChange={(e) => handleIngredientChange(index, e.target.value)}
-                                    placeholder={`Ingredient ${index + 1}`}
-                                    required
-                                />
-                                {formData.recipeIngredients!.length > 1 && (
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => removeIngredient(index)}
-                                        className="h-8 w-8 shrink-0"
-                                    >
-                                        <X className="h-4 w-4"/>
-                                        <span className="sr-only">Quitar</span>
-                                    </Button>
-                                )}
-                            </div>
-                        ))}
-                    </CardContent>
-                </Card>
-            </div>
-
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <Label>Pasos de la preparación</Label>
-                    <Button type="button" variant="outline" size="sm" onClick={addStep} className="flex items-center gap-1">
-                        <Plus className="h-4 w-4"/> Añadir paso
-                    </Button>
-                </div>
-
-                <Card>
-                    <CardContent className="p-4 space-y-4">
-                        {formData.recipeSteps?.map((step, index) => (
-                            <div key={index} className="flex gap-2">
-                                <div className="flex-shrink-0 flex items-start pt-2">
-                                    <div
-                                        className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
-                                        {index + 1}
-                                    </div>
-                                </div>
-                                <div className="flex-grow space-y-1">
-                                    <Textarea
-                                        value={step}
-                                        onChange={(e) => handleStepChange(index, e.target.value)}
-                                        placeholder={`Step ${index + 1}`}
-                                        rows={2}
-                                        required
-                                    />
-                                    {formData.recipeSteps!.length > 1 && (
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => removeStep(index)}
-                                            className="h-8 px-2 text-muted-foreground"
-                                        >
-                                            <X className="h-3 w-3 mr-1"/> Quitar
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </CardContent>
-                </Card>
-            </div>
 
             <div className="flex justify-end gap-4">
                 <Button type="button" variant="outline" asChild>
