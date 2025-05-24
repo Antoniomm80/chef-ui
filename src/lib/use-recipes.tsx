@@ -17,6 +17,19 @@ export const recipesService = {
             }
         }
     },
+    async updateRecipe(recipeId: number, recipe: Partial<RecipeBackend>): Promise<RecipeBackend> {
+        try {
+            const result = await axios.put<RecipeBackend>(`${SERVER_URL}/recipes/${recipeId}`, recipe);
+            return result.data;
+        } catch (error) {
+            const errors = error as Error | AxiosError;
+            if (axios.isAxiosError(error)) {
+                throw new Error(errors.message);
+            } else {
+                throw error;
+            }
+        }
+    },
     async findById(recipeId: number): Promise<RecipeBackend> {
         try {
             const result = await axios.get<RecipeBackend>(`${SERVER_URL}/recipes/${recipeId}`);

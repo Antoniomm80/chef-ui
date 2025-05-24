@@ -19,10 +19,12 @@ import {StepsSection} from "@/components/app/StepsSection.tsx";
 
 
 interface RecipeFormProps {
-    initialData?: RecipeBackend
+    initialData?: RecipeBackend;
+    onUpdateComplete?: () => void;
+    onCancelEdit?: () => void;
 }
 
-export default function RecipeForm({initialData}: RecipeFormProps) {
+export default function RecipeForm({initialData, onUpdateComplete, onCancelEdit}: RecipeFormProps) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [formData, setFormData] = useState<Partial<RecipeBackend>>({
@@ -60,16 +62,26 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
 
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        const newRecipe = await recipesService.createRecipe(formData);
-        //updates the cache
-        queryClient.setQueryData<RecipeBackend[]>(["recipes"], (oldData) => {
-            if (!oldData) return [];
-            return [...oldData, newRecipe];
-        })
-        toast("La receta se ha guardado correctamente");
-        navigate("/");
-
+        e.preventDefault();
+        if (initialData && initialData.id) {
+            // Update existing recipe
+            await recipesService.updateRecipe(initialData.id, formData);
+            await queryClient.invalidateQueries({queryKey: ['recipes', initialData.id]});
+            // also invalidate the list of recipes
+            await queryClient.invalidateQueries({ queryKey: ['recipes'] });
+            toast("La receta se ha actualizado correctamente");
+            onUpdateComplete?.();
+        } else {
+            // Create new recipe
+            const newRecipe = await recipesService.createRecipe(formData);
+            //updates the cache
+            queryClient.setQueryData<RecipeBackend[]>(["recipes"], (oldData) => {
+                if (!oldData) return [];
+                return [...oldData, newRecipe];
+            })
+            toast("La receta se ha guardado correctamente");
+            navigate("/");
+        }
     }
 
     const handleParseUrl = async () => {
@@ -247,9 +259,15 @@ export default function RecipeForm({initialData}: RecipeFormProps) {
 
 
             <div className="flex justify-end gap-4">
-                <Button type="button" variant="outline" asChild>
-                    <a href="/">Cancelar</a>
-                </Button>
+                {initialData && initialData.id ? (
+                    <Button type="button" variant="outline" onClick={onCancelEdit}>
+                        Cancelar
+                    </Button>
+                ) : (
+                    <Button type="button" variant="outline" asChild>
+                        <a href="/">Cancelar</a>
+                    </Button>
+                )}
                 <Button type="submit">Guardar</Button>
             </div>
         </form>

@@ -8,11 +8,18 @@ import {IngredientsCard} from "@/components/app/IngredientsCard.tsx";
 import {RecipeInfoPanel} from "@/components/app/RecipeInfoPanel.tsx";
 import {RecipeImage} from "@/components/app/RecipeImage.tsx";
 import {RecipeToolbar} from "@/components/app/RecipeToolbar.tsx";
+import {RecipeForm} from "@/components/app/RecipeForm.tsx";
 
 
 export default function RecipePage() {
     const {"recipe-id": recipeId} = useParams();
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+
+    const toggleEditMode = () => {
+        setIsEditing(!isEditing);
+    };
+
     if (!recipeId) {
         throw new Error("recipeId is required")
     }
@@ -24,19 +31,23 @@ export default function RecipePage() {
     return (
         <div className="container px-4 py-8 md:py-12 mx-auto">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-                <RecipeToolbar setIsDeleteDialogOpen={setIsDeleteDialogOpen}/>
+                <RecipeToolbar setIsDeleteDialogOpen={setIsDeleteDialogOpen} onEditClick={toggleEditMode}/>
             </div>
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
-                <div className="space-y-4">
-                    <RecipeImage imageUrl={recipe.imageUrl} imageAlt={recipe.name}/>
+            {isEditing ? (
+                <RecipeForm initialData={recipe} onUpdateComplete={toggleEditMode} onCancelEdit={toggleEditMode} />
+            ) : (
+                <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
+                    <div className="space-y-4">
+                        <RecipeImage imageUrl={recipe.imageUrl} imageAlt={recipe.name}/>
+                    </div>
+                    <div className="space-y-6">
+                        <RecipeInfoPanel recipe={recipe}/>
+                        <Separator/>
+                        <IngredientsCard recipeIngredients={recipe.recipeIngredients}/>
+                        <InstructionsCard recipeSteps={recipe.recipeSteps}/>
+                    </div>
                 </div>
-                <div className="space-y-6">
-                    <RecipeInfoPanel recipe={recipe}/>
-                    <Separator/>
-                    <IngredientsCard recipeIngredients={recipe.recipeIngredients}/>
-                    <InstructionsCard recipeSteps={recipe.recipeSteps}/>
-                </div>
-            </div>
+            )}
             <DeleteDialog recipeId={recipeId}
                           recipeName={recipe.name}
                           isDeleteDialogOpen={isDeleteDialogOpen}
