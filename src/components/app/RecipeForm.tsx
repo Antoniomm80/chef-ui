@@ -65,10 +65,10 @@ export default function RecipeForm({initialData, onUpdateComplete, onCancelEdit}
         e.preventDefault();
         if (initialData && initialData.id) {
             // Update existing recipe
-            await recipesService.updateRecipe(initialData.id, formData);
+            await recipesService.updateRecipe(parseInt(initialData.id), formData);
             await queryClient.invalidateQueries({queryKey: ['recipes', initialData.id]});
             // also invalidate the list of recipes
-            await queryClient.invalidateQueries({ queryKey: ['recipes'] });
+            await queryClient.invalidateQueries({queryKey: ['recipes']});
             toast("La receta se ha actualizado correctamente");
             onUpdateComplete?.();
         } else {

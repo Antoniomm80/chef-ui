@@ -8,7 +8,7 @@ import {IngredientsCard} from "@/components/app/IngredientsCard.tsx";
 import {RecipeInfoPanel} from "@/components/app/RecipeInfoPanel.tsx";
 import {RecipeImage} from "@/components/app/RecipeImage.tsx";
 import {RecipeToolbar} from "@/components/app/RecipeToolbar.tsx";
-import {RecipeForm} from "@/components/app/RecipeForm.tsx";
+import RecipeForm from "@/components/app/RecipeForm.tsx";
 
 
 export default function RecipePage() {
@@ -34,7 +34,7 @@ export default function RecipePage() {
                 <RecipeToolbar setIsDeleteDialogOpen={setIsDeleteDialogOpen} onEditClick={toggleEditMode}/>
             </div>
             {isEditing ? (
-                <RecipeForm initialData={recipe} onUpdateComplete={toggleEditMode} onCancelEdit={toggleEditMode} />
+                <RecipeForm initialData={recipe} onUpdateComplete={toggleEditMode} onCancelEdit={toggleEditMode}/>
             ) : (
                 <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
                     <div className="space-y-4">
